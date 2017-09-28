@@ -51,12 +51,12 @@ i = 0
 
 Dir.glob(options[:sourcedir] + '/*.txt') do |txtfile|
     # Parse the contents; in this case, zero or more email addresses.
-    email = []
+    emails = []
     File.readlines(txtfile).each do |x|
         # sometimes there are commas
         x.delete! ','
         # remove newlines, etc
-        email.push(x.strip)
+        emails.push(x.strip)
     end
 
     # Generate a default name based on the filename
@@ -66,7 +66,7 @@ Dir.glob(options[:sourcedir] + '/*.txt') do |txtfile|
     obj = {}
     obj['name'] = name
     obj['url'] = ''
-    obj['email'] = email
+    obj['emails'] = emails
     obj['categories'] = {}
 
     # Make JSON from object
