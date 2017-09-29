@@ -11,11 +11,11 @@ OptionParser.new do |opts|
     opts.on('--sourcedir DIR', 'Directory where configs are located.') { |v|
         options[:sourcedir] = v
     }
-    opts.on('--outputjson FILE', 'Dump processed data to JSON.') { |v|
-        options[:outputjson] = v
+    opts.on('--destjson FILE', 'Dump processed data to JSON.') { |v|
+        options[:destjson] = v
     }
-    opts.on('--outputcsv FILE', 'Dump processed data to CSV.') { |v|
-        options[:outputcsv] = v
+    opts.on('--destcsv FILE', 'Dump processed data to CSV.') { |v|
+        options[:destcsv] = v
     }
 
     opts.on('-h', '--help', 'This help.') do
@@ -26,7 +26,7 @@ end.parse!
 
 # Require some runtime args.
 if not (options[:sourcedir]) then
-    puts 'ERROR: Must specify souredir. See --help'
+    puts 'ERROR: Must specify sourcedir. See --help'
     exit 1
 end
 
@@ -63,16 +63,14 @@ Dir.glob(options[:sourcedir] + '/*.json') { |configfile|
 }
 
 # If requested, dump the raw output to a file.
-if options[:outputjson] then
-    File.open(options[:outputjson], 'w') do |f|
+if options[:destjson] then
+    File.open(options[:destjson], 'w') do |f|
         f.write(JSON.pretty_generate(configs))
     end
 end
-if options[:outputcsv] then
-    File.open(options[:outputcsv], 'w') do |f|
+if options[:destcsv] then
+    File.open(options[:destcsv], 'w') do |f|
         configs.each do |k,v|
-            puts k
-            puts v['url']
             f.write(k + ',' + v['url'] + "\n")
         end
     end
