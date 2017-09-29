@@ -14,6 +14,9 @@ OptionParser.new do |opts|
     opts.on('--destdir DIR', 'Direcotry where .json will end up (same as sourcedir by default).') do |v|
         options[:destdir] = v
     end
+    opts.on('--force', 'Overwrite target JSON (danger!)') do
+        options[:force] = true
+    end
 
     opts.on('-h', '--help', 'This help.') do
         puts opts
@@ -47,7 +50,8 @@ else
     exit 1
 end
 
-i = 0
+processed = 0
+skipped = 0
 
 Dir.glob(options[:sourcedir] + '/*.txt') do |txtfile|
     # Parse the contents; in this case, zero or more email addresses.
@@ -69,16 +73,22 @@ Dir.glob(options[:sourcedir] + '/*.txt') do |txtfile|
     obj['emails'] = emails
     obj['categories'] = {}
 
-    # Make JSON from object
-    File.open(options[:destdir] + '/' + name + '.json', 'w') do |f|
-        f.puts JSON.pretty_generate(obj)
+    # Make JSON file from object
+    jsonfile = options[:destdir] + '/' + name + '.json'
+
+    if not File.exist?(jsonfile) or options[:force] then
+        File.open(jsonfile, 'w') do |f|
+            f.puts JSON.pretty_generate(obj)
+        end
+        puts 'Processed ' + txtfile
+        processed += 1
+    else
+        puts 'Skipped ' + txtfile
+        skipped += 1
     end
-
-    puts 'Processed ' + txtfile
-
-    i += 1
 end
 
-puts 'Total processed files: ' + i.to_s
+puts 'Total processed: ' + processed.to_s
+puts 'Total skipped: ' + skipped.to_s
 
 exit 0
