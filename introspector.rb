@@ -43,6 +43,7 @@ configs = {}
 
 # Run through the configs.
 Dir.glob(options[:sourcedir] + '/*.json') { |configfile|
+    puts 'Processing ' + configfile
     configjson = JSON.parse(File.read(configfile))
 
     # Gather some useful info.
@@ -50,10 +51,18 @@ Dir.glob(options[:sourcedir] + '/*.json') { |configfile|
 
     # Get a URL; this could be a string or, if more complex, a hash.
     url = nil
-    if configjson['start_urls'][0].is_a?(String) then
-        url = configjson['start_urls'][0]
-    elsif configjson['start_urls'][0].is_a?(Hash) then
-        url = configjson['start_urls'][0]['url']
+
+    # Most sites use start_url; some use XML sitemaps.
+    if configjson['start_urls'] then
+        url_type = 'start_urls'
+    elsif configjson['sitemap_urls'] then
+        url_type = 'sitemap_urls'
+    end
+
+    if configjson[url_type][0].is_a?(String) then
+        url = configjson[url_type][0]
+    elsif configjson[url_type][0].is_a?(Hash) then
+        url = configjson[url_type][0]['url']
     end
     # This may contain regexes and stuff; maybe fix in the future. :P
 
@@ -64,14 +73,16 @@ Dir.glob(options[:sourcedir] + '/*.json') { |configfile|
 
 # If requested, dump the raw output to a file.
 if options[:destjson] then
+    puts 'Writing JSON to ' + options[:destjson]
     File.open(options[:destjson], 'w') do |f|
         f.write(JSON.pretty_generate(configs))
     end
 end
 if options[:destcsv] then
+    puts 'Writing CSV to ' + options[:destcsv]
     File.open(options[:destcsv], 'w') do |f|
         configs.each do |k,v|
-            f.write(k + ',' + v['url'] + "\n")
+            f.write(k.to_s + ',' + v['url'].to_s + "\n")
         end
     end
 end
