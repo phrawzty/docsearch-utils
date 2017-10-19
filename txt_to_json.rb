@@ -71,7 +71,7 @@ Dir.glob(options[:sourcedir] + '/*.txt') do |txtfile|
     obj['name'] = name
     obj['url'] = ''
     obj['emails'] = emails
-    obj['categories'] = {}
+    obj['categories'] = []
 
     # Make JSON file from object
     jsonfile = options[:destdir] + '/' + name + '.json'
